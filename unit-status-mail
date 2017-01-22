@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+usage() {
+  logger --stderr --tag "$0" "USAGE: $0 systemd-unit-name recipient"
+  exit 1
+}
+
+UNIT=$1
+[[ -z $UNIT ]] && usage
+MAILTO=$2
+[[ -z $MAILTO ]] && usage
+MAILFROM="unit-status-mailer"
+
+EXTRA=""
+for e in "${@:3}"; do
+  EXTRA+="$e"$'\n'
+done
+
+UNITSTATUS=$(systemctl status $UNIT --full --lines=100)
+
+sendmail $MAILTO <<EOF
+From:$MAILFROM
+To:$MAILTO
+Subject:Status mail for unit $UNIT
+
+Status report for unit $UNIT
+$EXTRA
+
+$UNITSTATUS
+EOF
+
+logger --stderr --tag "$0" "Status mail sent to $MAILTO for unit $UNIT" 

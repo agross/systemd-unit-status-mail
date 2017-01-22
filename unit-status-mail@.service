@@ -1,0 +1,18 @@
+# Start this systemd unit with
+#   systemctl start unit-status-mail@foo.service
+# Check the result with
+#   systemctl status unit-status-mail@foo.service
+#
+# %n == The full unit name, e.g. "nginx.service".
+# %p == The unit's prefix, e.g. "nginx".
+
+[Unit]
+Description=Unit Status Mailer Service
+After=network.target
+
+[Service]
+ExecStart=/etc/systemd/system/unit-status-mail %i \
+                                               ${MAILTO} \
+                                               "Hostname: %H" \
+                                               "Machine ID: %m" \
+                                               "Boot ID: %b"

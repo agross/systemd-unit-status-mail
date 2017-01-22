@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+set -e
+
+script_path="$(dirname "$(readlink --canonicalize-existing "$0")")"
+systemd_path='/etc/systemd/system'
+
+for unit in unit-status-mail@.service unit-status-mail; do
+  file="$script_path/$unit"
+
+  printf "Linking %s\n" "$file"
+  # systemctl link fails when using the '@' unit name, emulate it.
+  ln --symbolic --force "$file" "$systemd_path/$unit"
+done
